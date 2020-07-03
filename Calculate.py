@@ -67,7 +67,7 @@ def check_for_signal(input_file_name, signal_name):
         sys.exit()
     return signal_process_index_values
 
-def get_for_cut_names(file_name):
+def get_cut_names(file_name):
     """Takes in a log.txt file, returns a list of cuts applied.
     """
     list_of_cuts = []
@@ -163,7 +163,7 @@ def main():
     signal_index_values = check_for_signal(args.input[0], args.signal)
     
     #Decides what the final cut is
-    cuts_in_file = get_for_cut_names(args.input[0])
+    cuts_in_file = get_cut_names(args.input[0])
     final_cut_selection = str(cuts_in_file[-1])
     if args.final_selection is not None:
         final_cut_selection = str(args.final_selection)
@@ -178,6 +178,9 @@ def main():
         print("No central selection specified, efficiency & central selection scale factor therefore not calculated")
     else:
         print("central selection cut is:", args.central_selection)
+        if str(args.central_selection) not in cuts_in_file:
+            print("Central selection cut not found, avaiable options are: ", cuts_in_file)
+            sys.exit()
         if cuts_in_file.index(final_cut_selection) <= cuts_in_file.index(str(args.central_selection)):#Makes sure central selection cut comes before final selection cut
             print("Make sure your central selection cut comes after your final selection cut.")
             print("cut options are: ", cuts_in_file)
@@ -185,6 +188,7 @@ def main():
     
     #Main for loop of the program:
     for i,files in enumerate(args.input):
+        cs_accounted_for = False
         if (args.central_selection is not None):
             if str(args.central_selection) not in cuts_in_file:
                 print("central selection cut not found, avaiable options are: ", cuts_in_file)
@@ -201,12 +205,16 @@ def main():
             print("Central Selection total background: %.1f +/- %.1f" % (cs_background, cs_background_err))
             print("Central Selection global data/MC ratio: %f +/- %f" % (cs_data_to_MC, cs_data_to_MC_err))
             print("***************************")
+            cs_accounted_for = True
         input_process_names_list, input_final_cut_values_list = open_log_file(files, final_cut_selection)
         input_data, input_data_err, input_signal, input_signal_err, input_background, input_background_err= convert_opened_file(input_process_names_list, input_final_cut_values_list, signal_index_values)
         input_scale_factor = scale_factor(input_data, input_data_err, input_signal, input_signal_err, input_background, input_background_err)
         input_purity = purity(input_signal, input_signal_err, input_background, input_background_err)
         input_data_to_MC, input_data_to_MC_err = calculate_data_to_MC(input_data, input_data_err, input_signal, input_signal_err, input_background, input_background_err)
-        print("%s scale factor is: %f +/- %f (central selection SF is accounted for)" % (files, (input_scale_factor[0]/cs_scale_factor), input_scale_factor[1]))
+        if cs_accounted_for == True:
+            print("%s scale factor is: %f +/- %f (central selection SF is accounted for)" % (files, (input_scale_factor[0]/cs_scale_factor), input_scale_factor[1]))
+        else:
+            print("%s scale factor is: %f +/- %f (central selection SF NOT accounted for)" % (files, (input_scale_factor[0]/cs_scale_factor), input_scale_factor[1]))
         print("%s purity is: %f" % (files, input_purity))
         if args.central_selection is not None:
             input_efficiency = efficiency(cs_data, cs_data_err, cs_background, cs_background_err, input_data, input_data_err, input_background, input_background_err)

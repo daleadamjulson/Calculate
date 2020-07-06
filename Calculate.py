@@ -187,7 +187,7 @@ def main():
             sys.exit()
     
     #Main for loop of the program:
-    for i,files in enumerate(args.input):
+    for i, files in enumerate(args.input):
         cs_accounted_for = False
         if (args.central_selection is not None):
             if str(args.central_selection) not in cuts_in_file:
@@ -198,6 +198,7 @@ def main():
             cs_scale_factor, cs_scale_factor_err = scale_factor(cs_data, cs_data_err, cs_signal, cs_signal_err, cs_background, cs_background_err)
             cs_purity = purity(cs_signal, cs_signal_err, cs_background, cs_background_err)
             cs_data_to_MC, cs_data_to_MC_err = calculate_data_to_MC(cs_data, cs_data_err, cs_signal, cs_signal_err, cs_background, cs_background_err)
+            print("For: ", files)
             print("Central selection Scale Factor is: %f +/- %f" % (cs_scale_factor, cs_scale_factor_err))
             print("Central Selection purity is: %f" % cs_purity)
             print("Central Selection total data: %.1f +/- %.1f" % (cs_data, cs_data_err))

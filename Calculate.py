@@ -157,7 +157,7 @@ def main():
         print("Please provide input log.txt files, exiting program.")
         sys.exit()
     else:
-        print("input file(s) is:", args.input)
+        print("input file(s) is:"+str(args.input))
     
     #Make sure there is a signal process
     signal_index_values = check_for_signal(args.input[0], args.signal)
@@ -168,9 +168,9 @@ def main():
     if args.final_selection is not None:
         final_cut_selection = str(args.final_selection)
         if final_cut_selection not in cuts_in_file:
-            print("Final selection cut not found, avaiable options are: ", cuts_in_file)
+            print("Final selection cut not found, avaiable options are: "+str(cuts_in_file))
             sys.exit()
-    print("Final selection cut is ", final_cut_selection)
+    print("Final selection cut is "+str(final_cut_selection))
     
     #Scale factor is always divided by central scale factor so if we dont have one, set it to 1.
     if args.central_selection is None:
@@ -179,11 +179,11 @@ def main():
     else:
         print("central selection cut is:", args.central_selection)
         if str(args.central_selection) not in cuts_in_file:
-            print("Central selection cut not found, avaiable options are: ", cuts_in_file)
+            print("Central selection cut not found, avaiable options are: "+str(cuts_in_file))
             sys.exit()
         if cuts_in_file.index(final_cut_selection) <= cuts_in_file.index(str(args.central_selection)):#Makes sure central selection cut comes before final selection cut
             print("Make sure your central selection cut comes after your final selection cut.")
-            print("cut options are: ", cuts_in_file)
+            print("cut options are: "+str(cuts_in_file))
             sys.exit()
     
     #Main for loop of the program:
@@ -198,7 +198,7 @@ def main():
             cs_scale_factor, cs_scale_factor_err = scale_factor(cs_data, cs_data_err, cs_signal, cs_signal_err, cs_background, cs_background_err)
             cs_purity = purity(cs_signal, cs_signal_err, cs_background, cs_background_err)
             cs_data_to_MC, cs_data_to_MC_err = calculate_data_to_MC(cs_data, cs_data_err, cs_signal, cs_signal_err, cs_background, cs_background_err)
-            print("For: ", files)
+            print("For: "+str(files))
             print("Central selection Scale Factor is: %f +/- %f" % (cs_scale_factor, cs_scale_factor_err))
             print("Central Selection purity is: %f" % cs_purity)
             print("Central Selection total data: %.1f +/- %.1f" % (cs_data, cs_data_err))

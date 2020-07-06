@@ -157,7 +157,7 @@ def main():
         print("Please provide input log.txt files, exiting program.")
         sys.exit()
     else:
-        print("input file(s) is:"+str(args.input))
+        print("input file(s) is: "+str(args.input))
     
     #Make sure there is a signal process
     signal_index_values = check_for_signal(args.input[0], args.signal)
@@ -170,14 +170,14 @@ def main():
         if final_cut_selection not in cuts_in_file:
             print("Final selection cut not found, avaiable options are: "+str(cuts_in_file))
             sys.exit()
-    print("Final selection cut is "+str(final_cut_selection))
+    print("Final selection cut is: "+str(final_cut_selection))
     
     #Scale factor is always divided by central scale factor so if we dont have one, set it to 1.
     if args.central_selection is None:
         cs_scale_factor = 1
         print("No central selection specified, efficiency & central selection scale factor therefore not calculated")
     else:
-        print("central selection cut is:", args.central_selection)
+        print("central selection cut is: " +str(args.central_selection))
         if str(args.central_selection) not in cuts_in_file:
             print("Central selection cut not found, avaiable options are: "+str(cuts_in_file))
             sys.exit()

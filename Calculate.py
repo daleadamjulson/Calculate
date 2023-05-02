@@ -137,9 +137,11 @@ def purity(signal, signal_err, background, background_err):
     return purity_value
     
 def calculate_data_to_MC(data, data_err, signal, signal_err, background, background_err):
-    data_to_MC = data/(signal+background)
+    total_MC = signal+background
+    total_MC_err = sum_of_squares([signal_err,background_err])
+    data_to_MC = data/total_MC
     data_to_MC_err = data_to_MC*np.sqrt(np.square(data_err/data)+np.square(sum_of_squares([signal_err,background_err])/(signal+background)))
-    return data_to_MC, data_to_MC_err
+    return data_to_MC, data_to_MC_err, total_MC, total_MC_err
     
 def main():
 
@@ -197,11 +199,12 @@ def main():
             cs_data, cs_data_err, cs_signal, cs_signal_err, cs_background, cs_background_err = convert_opened_file(cs_process_names_list, cs_final_cut_values_list, signal_index_values)
             cs_scale_factor, cs_scale_factor_err = scale_factor(cs_data, cs_data_err, cs_signal, cs_signal_err, cs_background, cs_background_err)
             cs_purity = purity(cs_signal, cs_signal_err, cs_background, cs_background_err)
-            cs_data_to_MC, cs_data_to_MC_err = calculate_data_to_MC(cs_data, cs_data_err, cs_signal, cs_signal_err, cs_background, cs_background_err)
+            cs_data_to_MC, cs_data_to_MC_err, cs_total_MC, cs_total_MC_err = calculate_data_to_MC(cs_data, cs_data_err, cs_signal, cs_signal_err, cs_background, cs_background_err)
             print("For: "+str(files))
             print("Central selection Scale Factor is: %f +/- %f" % (cs_scale_factor, cs_scale_factor_err))
             print("Central Selection purity is: %f" % cs_purity)
             print("Central Selection total data: %.1f +/- %.1f" % (cs_data, cs_data_err))
+            print("Central Selection total MC: %.1f +/- %.1f" % (cs_total_MC, cs_total_MC_err))
             print("Central Selection total signal: %.1f +/- %.1f" % (cs_signal, cs_signal_err))
             print("Central Selection total background: %.1f +/- %.1f" % (cs_background, cs_background_err))
             print("Central Selection global data/MC ratio: %f +/- %f" % (cs_data_to_MC, cs_data_to_MC_err))
@@ -211,7 +214,7 @@ def main():
         input_data, input_data_err, input_signal, input_signal_err, input_background, input_background_err= convert_opened_file(input_process_names_list, input_final_cut_values_list, signal_index_values)
         input_scale_factor = scale_factor(input_data, input_data_err, input_signal, input_signal_err, input_background, input_background_err)
         input_purity = purity(input_signal, input_signal_err, input_background, input_background_err)
-        input_data_to_MC, input_data_to_MC_err = calculate_data_to_MC(input_data, input_data_err, input_signal, input_signal_err, input_background, input_background_err)
+        input_data_to_MC, input_data_to_MC_err, input_total_MC, input_total_MC_err = calculate_data_to_MC(input_data, input_data_err, input_signal, input_signal_err, input_background, input_background_err)
         if cs_accounted_for == True:
             print("%s scale factor is: %f +/- %f (central selection SF is accounted for)" % (files, (input_scale_factor[0]/cs_scale_factor), input_scale_factor[1]))
         else:
@@ -221,6 +224,7 @@ def main():
             input_efficiency = efficiency(cs_data, cs_data_err, cs_background, cs_background_err, input_data, input_data_err, input_background, input_background_err)
             print("%s efficiency is : %s +/- %s" % (files, input_efficiency[0], input_efficiency[1]))
         print("Total data: %.1f +/- %.1f" % (input_data, input_data_err))
+        print("Total MC: %.1f +/- %.1f" % (input_total_MC, input_total_MC_err))
         print("Total signal: %.1f +/- %.1f" % (input_signal, input_signal_err))
         print("Total background: %.1f +/- %.1f" % (input_background, input_background_err))
         print("Global data/MC ratio: %f +/- %f" % (input_data_to_MC, input_data_to_MC_err))
